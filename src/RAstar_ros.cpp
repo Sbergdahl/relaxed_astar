@@ -212,9 +212,12 @@ MyExcelFile << startCell <<"\t"<< start.pose.position.x <<"\t"<< start.pose.posi
 
         float x = 0.0;
         float y = 0.0;
+		cout << "x=" << x << " y=" << y << endl;
 
         int index = bestPath[i];
-
+		//must be changed in order to accomodate input as as list of coordinates
+		//So parse file and read each x and  y coordinate
+		
         convertToCoordinate(index, x, y);
 
         geometry_msgs::PoseStamped pose = goal;
@@ -269,15 +272,16 @@ MyExcelFile << startCell <<"\t"<< start.pose.position.x <<"\t"<< start.pose.posi
 }
 void RAstarPlannerROS::getCorrdinate(float& x, float& y)
 {
-
+	cout << "DEBUG: getCorrdinate executed" << endl;
   x = x - originX;
   y = y - originY;
 
 }
 
+// keep this one. 
 int RAstarPlannerROS::convertToCellIndex(float x, float y)
 {
-
+	cout << "DEBUG: convertToCellIndex executed" << endl;
   int cellIndex;
 
   float newX = x / resolution;
@@ -290,7 +294,7 @@ int RAstarPlannerROS::convertToCellIndex(float x, float y)
 
 void RAstarPlannerROS::convertToCoordinate(int index, float& x, float& y)
 {
-
+	cout << "DEBUG: convertTOCoordinate executed"<< endl;
   x = getCellColID(index) * resolution;
 
   y = getCellRowID(index) * resolution;
@@ -302,22 +306,24 @@ void RAstarPlannerROS::convertToCoordinate(int index, float& x, float& y)
 
 bool RAstarPlannerROS::isCellInsideMap(float x, float y)
 {
-  bool valid = true;
+    cout << "DEBUG: isCellInsideMap executed" << endl;
+    bool valid = true;
 
-  if (x > (width * resolution) || y > (height * resolution))
-    valid = false;
+    if (x > (width * resolution) || y > (height * resolution))
+        valid = false;
 
   return valid;
 }
 
 void RAstarPlannerROS::mapToWorld(double mx, double my, double& wx, double& wy){
+	cout << "DEBUG: mapToWorld executed" << endl;
    costmap_2d::Costmap2D* costmap = costmap_ros_->getCostmap();
     wx = costmap->getOriginX() + mx * resolution;
     wy = costmap->getOriginY() + my * resolution;
 }
 
 vector<int> RAstarPlannerROS::RAstarPlanner(int startCell, int goalCell){
-
+	cout << "DEBUG: RASstarPLannerROS executed" << endl;
    vector<int> bestPath;
 
 
@@ -353,6 +359,7 @@ for (uint i=0; i<mapSize; i++)
 /*********************************************************************************/
 vector<int> RAstarPlannerROS::findPath(int startCell, int goalCell, float g_score[])
 {
+	cout << "DEBUG: findPath executed" << endl;
 	value++;
 	vector<int> bestPath;
 	vector<int> emptyPath;
@@ -411,6 +418,7 @@ vector<int> RAstarPlannerROS::findPath(int startCell, int goalCell, float g_scor
 /*********************************************************************************/
 vector<int> RAstarPlannerROS::constructPath(int startCell, int goalCell,float g_score[])
 {
+	cout << "DEBUG: constructPath executed" << endl;
 	vector<int> bestPath;
 	vector<int> path;
 
@@ -469,6 +477,7 @@ float RAstarPlannerROS::calculateHCost(int cellID, int goalCell)
 /*********************************************************************************/
 void RAstarPlannerROS::addNeighborCellToOpenList(multiset<cells> & OPL, int neighborCell, int goalCell, float g_score[])
 {
+	cout << "DEBUG: addNeighborCellToOpenList executed" << endl;
 	cells CP;
 	CP.currentCell=neighborCell; //insert the neighbor cell
 	CP.fCost=g_score[neighborCell]+calculateHCost(neighborCell,goalCell);
@@ -488,6 +497,7 @@ void RAstarPlannerROS::addNeighborCellToOpenList(multiset<cells> & OPL, int neig
 
 vector <int> RAstarPlannerROS::findFreeNeighborCell (int CellID){
  
+	cout << "DEBUG: findFreeNeighborCell executed" << endl;
   int rowID=getCellRowID(CellID);
   int colID=getCellColID(CellID);
   int neighborIndex;
@@ -514,6 +524,7 @@ vector <int> RAstarPlannerROS::findFreeNeighborCell (int CellID){
 /*********************************************************************************/
 bool RAstarPlannerROS::isStartAndGoalCellsValid(int startCell,int goalCell)
 { 
+	cout << "DEBUG: isStartAndGoalCellValid executed" << endl;
  bool isvalid=true;
  bool isFreeStartCell=isFree(startCell);
  bool isFreeGoalCell=isFree(goalCell);
@@ -567,6 +578,7 @@ bool RAstarPlannerROS::isStartAndGoalCellsValid(int startCell,int goalCell)
 
 
  float  RAstarPlannerROS::getMoveCost(int i1, int j1, int i2, int j2){
+	 cout << "DEBUG: getMoveCost executed" << endl;
    float moveCost=INFINIT_COST;//start cost with maximum value. Change it to real cost of cells are connected
    //if cell2(i2,j2) exists in the diagonal of cell1(i1,j1)
    if((j2==j1+1 && i2==i1+1)||(i2==i1-1 && j2==j1+1) ||(i2==i1-1 && j2==j1-1)||(j2==j1-1 && i2==i1+1)){
@@ -584,6 +596,7 @@ bool RAstarPlannerROS::isStartAndGoalCellsValid(int startCell,int goalCell)
  } 
  
   float  RAstarPlannerROS::getMoveCost(int CellID1, int CellID2){
+	  cout << "DEBUG: getMoveCost CellID executed" << endl;
    int i1=0,i2=0,j1=0,j2=0;
     
    i1=getCellRowID(CellID1);
@@ -597,6 +610,7 @@ bool RAstarPlannerROS::isStartAndGoalCellsValid(int startCell,int goalCell)
 
  //verify if the cell(i,j) is free
  bool  RAstarPlannerROS::isFree(int i, int j){
+	 cout << "DEBUG: isFree executed" << endl;
    int CellID = getCellIndex(i, j);
  return OGM[CellID];
 
@@ -604,6 +618,7 @@ bool RAstarPlannerROS::isStartAndGoalCellsValid(int startCell,int goalCell)
 
   //verify if the cell(i,j) is free
  bool  RAstarPlannerROS::isFree(int CellID){
+	 cout << "DEBUG: RAstarPlannerROS executed" << endl;
  return OGM[CellID];
  } 
 }
